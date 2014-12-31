@@ -1,185 +1,194 @@
-var COLS = 10, ROWS = 20;
-var board = [];
-var lose;
-var interval;
-var current; // current moving shape
-var currentX, currentY; // position of current shape
+var COLS = 10, ROWS = 20;  // 盤面のマスの数
+var board = [];  // 盤面の状態を保持する変数
+var lose;  // 一番うえまで積み重なっちゃったフラグ
+var interval;  // ゲームタイマー保持用変数
+var current; // 現在操作しているブロック
+var currentX, currentY; // 現在操作しているブロックのいち
+// ブロックのパターン
 var shapes = [
-    [ 1, 1, 1, 1 ],
-    [ 1, 1, 1, 0,
-      1 ],
-    [ 1, 1, 1, 0,
-      0, 0, 1 ],
-    [ 1, 1, 0, 0,
-      1, 1 ],
-    [ 1, 1, 0, 0,
-      0, 1, 1 ],
-    [ 0, 1, 1, 0,
-      1, 1 ],
-    [ 0, 1, 0, 0,
-      1, 1, 1 ]
+  [ 1, 1, 1, 1 ],
+  [ 1, 1, 1, 0,
+    1 ],
+  [ 1, 1, 1, 0,
+    0, 0, 1 ],
+  [ 1, 1, 0, 0,
+    1, 1 ],
+  [ 1, 1, 0, 0,
+    0, 1, 1 ],
+  [ 0, 1, 1, 0,
+    1, 1 ],
+  [ 0, 1, 0, 0,
+    1, 1, 1 ]
 ];
+// ブロックの色
 var colors = [
-    'cyan', 'orange', 'blue', 'yellow', 'red', 'green', 'purple'
+  'cyan', 'orange', 'blue', 'yellow', 'red', 'green', 'purple'
 ];
 
-// creates a new 4x4 shape in global variable 'current'
-// 4x4 so as to cover the size when the shape is rotated
+// shapesからランダムにブロックのパターンを出力し、盤面の一番上へセットする
 function newShape() {
-    var id = Math.floor( Math.random() * shapes.length );
-    var shape = shapes[ id ]; // maintain id for color filling
-
-    current = [];
-    for ( var y = 0; y < 4; ++y ) {
-        current[ y ] = [];
-        for ( var x = 0; x < 4; ++x ) {
-            var i = 4 * y + x;
-            if ( typeof shape[ i ] != 'undefined' && shape[ i ] ) {
-                current[ y ][ x ] = id + 1;
-            }
-            else {
-                current[ y ][ x ] = 0;
-            }
-        }
+  var id = Math.floor( Math.random() * shapes.length );  // ランダムにインデックスを出す
+  var shape = shapes[ id ];
+  // パターンを操作ブロックへセットする
+  current = [];
+  for ( var y = 0; y < 4; ++y ) {
+    current[ y ] = [];
+    for ( var x = 0; x < 4; ++x ) {
+      var i = 4 * y + x;
+      if ( typeof shape[ i ] != 'undefined' && shape[ i ] ) {
+        current[ y ][ x ] = id + 1;
+      }
+      else {
+        current[ y ][ x ] = 0;
+      }
     }
-    // position where the shape will evolve
-    currentX = 5;
-    currentY = 0;
+  }
+  // ブロックを盤面の上のほうにセットする
+  currentX = 5;
+  currentY = 0;
 }
 
-// clears the board
+// 盤面を空にする
 function init() {
-    for ( var y = 0; y < ROWS; ++y ) {
-        board[ y ] = [];
-        for ( var x = 0; x < COLS; ++x ) {
-            board[ y ][ x ] = 0;
-        }
+  for ( var y = 0; y < ROWS; ++y ) {
+    board[ y ] = [];
+    for ( var x = 0; x < COLS; ++x ) {
+      board[ y ][ x ] = 0;
     }
+  }
 }
 
-// keep the element moving down, creating new shapes and clearing lines
+// newGameで指定した秒数毎に呼び出される関数。
+// 操作ブロックを下の方へ動かし、
+// 操作ブロックが着地したら消去処理、ゲームオーバー判定を行う
 function tick() {
-    if ( valid( 0, 1 ) ) {
-        ++currentY;
+  // １つ下へ移動する
+  if ( valid( 0, 1 ) ) {
+    ++currentY;
+  }
+  // もし着地していたら(１つしたにブロックがあったら)
+  else {
+    freeze();  // 操作ブロックを盤面へ固定する
+    clearLines();  // ライン消去処理
+    if (lose) {
+      // もしゲームオーバなら最初から始める
+      newGame();
+      return false;
     }
-    // if the element settled
-    else {
-        freeze();
-        clearLines();
-        if (lose) {
-            newGame();
-            return false;
-        }
-        newShape();
-    }
+    // 新しい操作ブロックをセットする
+    newShape();
+  }
 }
 
-// stop shape at its position and fix it to board
+// 操作ブロックを盤面にセットする関数
 function freeze() {
-    for ( var y = 0; y < 4; ++y ) {
-        for ( var x = 0; x < 4; ++x ) {
-            if ( current[ y ][ x ] ) {
-                board[ y + currentY ][ x + currentX ] = current[ y ][ x ];
-            }
-        }
+  for ( var y = 0; y < 4; ++y ) {
+    for ( var x = 0; x < 4; ++x ) {
+      if ( current[ y ][ x ] ) {
+        board[ y + currentY ][ x + currentX ] = current[ y ][ x ];
+      }
     }
+  }
 }
 
-// returns rotates the rotated shape 'current' perpendicularly anticlockwise
+// 操作ブロックを回す処理
 function rotate( current ) {
-    var newCurrent = [];
-    for ( var y = 0; y < 4; ++y ) {
-        newCurrent[ y ] = [];
-        for ( var x = 0; x < 4; ++x ) {
-            newCurrent[ y ][ x ] = current[ 3 - x ][ y ];
-        }
+  var newCurrent = [];
+  for ( var y = 0; y < 4; ++y ) {
+    newCurrent[ y ] = [];
+    for ( var x = 0; x < 4; ++x ) {
+      newCurrent[ y ][ x ] = current[ 3 - x ][ y ];
     }
-
-    return newCurrent;
+  }
+  return newCurrent;
 }
 
-// check if any lines are filled and clear them
+// 一行が揃っているか調べ、揃っていたらそれらを消す
 function clearLines() {
-    for ( var y = ROWS - 1; y >= 0; --y ) {
-        var rowFilled = true;
+  for ( var y = ROWS - 1; y >= 0; --y ) {
+    var rowFilled = true;
+    // 一行が揃っているか調べる
+    for ( var x = 0; x < COLS; ++x ) {
+      if ( board[ y ][ x ] == 0 ) {
+        rowFilled = false;
+        break;
+      }
+    }
+    // もし一行揃っていたら, サウンドを鳴らしてそれらを消す。
+    if ( rowFilled ) {
+      document.getElementById( 'clearsound' ).play();  // 消滅サウンドを鳴らす
+      // その上にあったブロックを一つずつ落としていく
+      for ( var yy = y; yy > 0; --yy ) {
         for ( var x = 0; x < COLS; ++x ) {
-            if ( board[ y ][ x ] == 0 ) {
-                rowFilled = false;
-                break;
-            }
+          board[ yy ][ x ] = board[ yy - 1 ][ x ];
         }
-        if ( rowFilled ) {
-            document.getElementById( 'clearsound' ).play();
-            for ( var yy = y; yy > 0; --yy ) {
-                for ( var x = 0; x < COLS; ++x ) {
-                    board[ yy ][ x ] = board[ yy - 1 ][ x ];
-                }
-            }
-            ++y;
-        }
+      }
+      ++y;  // 一行落としたのでチェック処理を一つ下へ送る
     }
+  }
 }
 
+
+// キーボードが押された時に呼び出される関数
 function keyPress( key ) {
-    switch ( key ) {
-        case 'left':
-            if ( valid( -1 ) ) {
-                --currentX;
-            }
-            break;
-        case 'right':
-            if ( valid( 1 ) ) {
-                ++currentX;
-            }
-            break;
-        case 'down':
-            if ( valid( 0, 1 ) ) {
-                ++currentY;
-            }
-            break;
-        case 'rotate':
-            var rotated = rotate( current );
-            if ( valid( 0, 0, rotated ) ) {
-                current = rotated;
-            }
-            break;
+  switch ( key ) {
+  case 'left':
+    if ( valid( -1 ) ) {
+      --currentX;  // 左に一つずらす
     }
+    break;
+  case 'right':
+    if ( valid( 1 ) ) {
+      ++currentX;  // 右に一つずらす
+    }
+    break;
+  case 'down':
+    if ( valid( 0, 1 ) ) {
+      ++currentY;  // 下に一つずらす
+    }
+    break;
+  case 'rotate':
+    // 操作ブロックを回す
+    var rotated = rotate( current );
+    if ( valid( 0, 0, rotated ) ) {
+      current = rotated;  // 回せる場合は回したあとの状態に操作ブロックをセットする
+    }
+    break;
+  }
 }
 
-// checks if the resulting position of current shape will be feasible
+// 指定された方向に、操作ブロックを動かせるかどうかチェックする
+// ゲームオーバー判定もここで行う
 function valid( offsetX, offsetY, newCurrent ) {
-    offsetX = offsetX || 0;
-    offsetY = offsetY || 0;
-    offsetX = currentX + offsetX;
-    offsetY = currentY + offsetY;
-    newCurrent = newCurrent || current;
-
-
-
-    for ( var y = 0; y < 4; ++y ) {
-        for ( var x = 0; x < 4; ++x ) {
-            if ( newCurrent[ y ][ x ] ) {
-                if ( typeof board[ y + offsetY ] == 'undefined'
-                  || typeof board[ y + offsetY ][ x + offsetX ] == 'undefined'
-                  || board[ y + offsetY ][ x + offsetX ]
-                  || x + offsetX < 0
-                  || y + offsetY >= ROWS
-                  || x + offsetX >= COLS ) {
-                    if (offsetY == 1) lose = true; // lose if the current shape at the top row when checked
-                    return false;
-                }
-            }
-        }
+  offsetX = offsetX || 0;
+  offsetY = offsetY || 0;
+  offsetX = currentX + offsetX;
+  offsetY = currentY + offsetY;
+  newCurrent = newCurrent || current;
+  for ( var y = 0; y < 4; ++y ) {
+    for ( var x = 0; x < 4; ++x ) {
+      if ( newCurrent[ y ][ x ] ) {
+        if ( typeof board[ y + offsetY ] == 'undefined'
+             || typeof board[ y + offsetY ][ x + offsetX ] == 'undefined'
+             || board[ y + offsetY ][ x + offsetX ]
+             || x + offsetX < 0
+             || y + offsetY >= ROWS
+             || x + offsetX >= COLS ) {
+               if (offsetY == 1) lose = true; // もし操作ブロックが盤面の上にあったらゲームオーバーにする
+               return false;
+             }
+      }
     }
-    return true;
+  }
+  return true;
 }
 
 function newGame() {
-    clearInterval(interval);
-    init();
-    newShape();
-    lose = false;
-    interval = setInterval( tick, 250 );
+  clearInterval(interval);  // ゲームタイマーをクリア
+  init();  // 盤面をまっさらにする
+  newShape();  // 新しい
+  lose = false;
+  interval = setInterval( tick, 250 );  // 250ミリ秒ごとにtickという関数を呼び出す
 }
 
-newGame();
+newGame();  // ゲームを開始する
