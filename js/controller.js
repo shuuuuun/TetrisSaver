@@ -4,10 +4,11 @@
 document.body.onkeydown = function( e ) {
   // キーに名前をセットする
   var keys = {
-    37: 'left',
-    39: 'right',
-    40: 'down',
-    38: 'rotate'
+    37: 'left',  // ←
+    39: 'right',  // →
+    40: 'down',  // ↓
+    38: 'rotate',  // ↑
+    32: 'stop'  // space
   };
 
   if ( typeof keys[ e.keyCode ] != 'undefined' ) {

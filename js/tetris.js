@@ -1,7 +1,6 @@
 getWinSize();  // ウインドウサイズ取得
 // var COLS = 10, ROWS = 20;  // 盤面のマスの数
 var COLS = Math.ceil(winW / boxSize), ROWS = Math.ceil(winH / boxSize);  // 盤面のマスの数
-console.log(COLS);
 var board = [];  // 盤面の状態を保持する変数
 var lose;  // 一番うえまで積み重なっちゃったフラグ
 var interval;  // ゲームタイマー保持用変数
@@ -25,7 +24,9 @@ var shapes = [
 ];
 // ブロックの色
 var colors = [
-  'cyan', 'orange', 'blue', 'yellow', 'red', 'green', 'purple'
+  // 'cyan', 'orange', 'blue', 'yellow', 'red', 'green', 'purple'
+  // I, L, J, O, Z, S, T
+  "rgb(107,180,252)","rgb(247,181,90)","rgb(251,122,111)","rgb(241,221,96)","rgb(202,162,221)","rgb(191,216,94)","rgb(182,182,182)"
 ];
 
 // shapesからランダムにブロックのパターンを出力し、盤面の一番上へセットする
@@ -46,8 +47,10 @@ function newShape() {
       }
     }
   }
+  var random = Math.floor( Math.random() * (COLS-4) );  // ランダムに初期位置を出す
+  // console.log(random);
   // ブロックを盤面の上のほうにセットする
-  currentX = 5;
+  currentX = random;
   currentY = 0;
 }
 
@@ -157,6 +160,17 @@ function keyPress( key ) {
       current = rotated;  // 回せる場合は回したあとの状態に操作ブロックをセットする
     }
     break;
+  case 'stop':
+      if(interval && timer){
+        clearTimeout(timer);
+        clearTimeout(interval);
+        timer = null;
+        interval = null;
+      }else{
+        timer = setInterval( render, 30 );
+        interval = setInterval( tick, 250 );
+      }
+    break;
   }
 }
 
@@ -177,7 +191,8 @@ function valid( offsetX, offsetY, newCurrent ) {
              || x + offsetX < 0
              || y + offsetY >= ROWS
              || x + offsetX >= COLS ) {
-               if (offsetY == 1 && offsetX-currentX == 0 && offsetY-currentY == 1){
+               // if (offsetY == 1 && offsetX-currentX == 0 && offsetY-currentY == 1){
+               if (offsetY == 1 && offsetY-currentY == 1){
                  console.log('game over');
                  lose = true; // もし操作ブロックが盤面の上にあったらゲームオーバーにする
                }
