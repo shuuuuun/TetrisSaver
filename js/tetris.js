@@ -1,4 +1,7 @@
-var COLS = 10, ROWS = 20;  // 盤面のマスの数
+getWinSize();  // ウインドウサイズ取得
+// var COLS = 10, ROWS = 20;  // 盤面のマスの数
+var COLS = Math.ceil(winW / boxSize), ROWS = Math.ceil(winH / boxSize);  // 盤面のマスの数
+console.log(COLS);
 var board = [];  // 盤面の状態を保持する変数
 var lose;  // 一番うえまで積み重なっちゃったフラグ
 var interval;  // ゲームタイマー保持用変数

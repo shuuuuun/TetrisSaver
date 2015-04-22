@@ -3,8 +3,26 @@
  */
 var canvas = document.getElementsByTagName( 'canvas' )[ 0 ];  // キャンバス
 var ctx = canvas.getContext( '2d' ); // コンテクスト
-var W = 300, H = 600;  // キャンバスのサイズ
-var BLOCK_W = W / COLS, BLOCK_H = H / ROWS;  // マスの幅を設定
+
+getWinSize();  // ウインドウサイズ取得
+canvas.width = winW;
+canvas.height = winH;
+
+// for retina
+canvas.width = winW * 2;
+canvas.height = winH * 2;
+canvas.style.width = winW + "px";
+canvas.style.height = winH + "px";
+// ctx.scale(2,2);
+boxSize *= 2;
+
+
+// var W = 300, H = 600;  // キャンバスのサイズ
+var W = canvas.width, H = canvas.height;  // キャンバスのサイズ
+
+// var BLOCK_W = W / COLS, BLOCK_H = H / ROWS;  // マスの幅を設定
+var BLOCK_W = boxSize, BLOCK_H = boxSize;  // マスの幅を設定
+
 
 // x, yの部分へマスを描画する処理
 function drawBlock( x, y ) {
