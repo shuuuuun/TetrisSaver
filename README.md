@@ -1,3 +1,13 @@
+テトリスをスクリーンセーバー用に全画面にしました。  
+demo: <http://shuuuuun.github.io/TetrisSaver/>
+
+[websaver](https://github.com/michaelhogg/websaver)を使えばmacのスクリーンセーバーに出来ます。
+
+こいつのすごいところは、スクリーンセーバーにしても操作できるところです。
+
+あと、横に広いので、なかなか揃いません。
+
+-----
 A very simple HTML5 version of Tetris, for educational purposes, made in 45 minutes.
 
 Watch the making-of timelapse:
