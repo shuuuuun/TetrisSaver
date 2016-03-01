@@ -7,6 +7,12 @@ demo: <http://shuuuuun.github.io/TetrisSaver/>
 
 あと、横に広いので、なかなか揃いません。
 
+スクリーンセーバーとは本来、同じものを表示し続けることによる画面の焼き付きを防ぐためのものでしたが、
+こいつは列を揃えて消さないかぎり、どんどん画面が埋まっていきます。
+どんどん焼き付いていきます。
+
+がんばってスクリーンをセーブしましょう。
+
 -----
 A very simple HTML5 version of Tetris, for educational purposes, made in 45 minutes.
 
