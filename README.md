@@ -5,8 +5,7 @@ It's made for screensaver.
 
 DEMO: <http://shuuuuun.github.io/tetreensaver/>
 
-[websaver](https://github.com/michaelhogg/websaver)を使えばmacのスクリーンセーバーに出来ます。
-
+[websaver](https://github.com/michaelhogg/websaver)というツールを使えばmacのスクリーンセーバーに出来ます。  
 ちなみに、スクリーンセーバーにしても操作できます。  
 あと、横に広いので、なかなか揃いません。  
 スクリーンセーバーとは本来、同じものを表示し続けることによる画面の焼き付きを防ぐためのものでしたが、  
